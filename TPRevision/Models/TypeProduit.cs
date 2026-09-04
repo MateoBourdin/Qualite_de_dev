@@ -16,7 +16,7 @@ public partial class TypeProduit
 
     [Column("nomTypeProduit")]
     [StringLength(50)]
-    public string nomTypeProduit { get; set; } = null!;
+    public string NomTypeProduit { get; set; } = null!;
 
     [InverseProperty(nameof(Produit.TypeProduitNavigation))]
     public ICollection<Produit>? produits { get; set; } = new List<Produit>();

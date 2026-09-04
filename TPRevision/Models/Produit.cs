@@ -31,13 +31,25 @@ public partial class Produit
     [StringLength(50)]
     public string UriPhoto { get; set; } = null!;
 
+    [Column("idMarque")]
+    public int IdMarque
+    {
+        get; set;
+    }
+
+    [Column("idTypeProduit")]
+    public int IdTypeProduit
+    {
+        get; set;
+    }
+
     [ForeignKey("idTypeProduit")]
-    [InverseProperty(nameof(TypeProduit.IdTypeProduit))]
+    [InverseProperty(nameof(TypeProduit.produits))]
     //[NavigationProperty]
     public virtual TypeProduit TypeProduitNavigation { get; set; } = null!;
 
     [ForeignKey("idMarque")]
-    [InverseProperty(nameof(Marque.IdMarque))]
+    [InverseProperty(nameof(Marque.produits))]
     //[NavigationProperty]
     public virtual Marque MarqueNavigation { get; set; } = null!;
 
