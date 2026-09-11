@@ -53,6 +53,8 @@ public class ProductController(IProduitRepository repo) : ControllerBase
 
     // POST api/product
     [HttpPost]
+    [Route("[action]")]
+    [ActionName("AddProduct")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -71,6 +73,8 @@ public class ProductController(IProduitRepository repo) : ControllerBase
 
     // PATCH api/product
     [HttpPatch]
+    [Route("[action]")]
+    [ActionName("ModifyProduct")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -87,6 +91,8 @@ public class ProductController(IProduitRepository repo) : ControllerBase
 
     // PUT api/product
     [HttpPut]
+    [Route("[action]")]
+    [ActionName("ModifyProductPartially")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -103,6 +109,8 @@ public class ProductController(IProduitRepository repo) : ControllerBase
 
     // DELETE api/product
     [HttpDelete]
+    [Route("[action]/{id}")]
+    [ActionName("Delete")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
