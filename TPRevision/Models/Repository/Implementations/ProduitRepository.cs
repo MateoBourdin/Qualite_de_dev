@@ -4,14 +4,14 @@ using TPRevision.Entities;
 
 public class ProduitRepository(DbProduitsContext context) : IProduitRepository
 {
-    public Task AddAsync(Produit entity)
+    public async Task AddAsync(Produit entity)
     {
-        throw new NotImplementedException();
+        await context.Produits.AddAsync(entity);
     }
 
-    public Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        await context.Produits.Where(p => p.IdProduit == id).ExecuteDeleteAsync();
     }
 
     public async Task<IEnumerable<Produit>> GetAllAsync()
@@ -19,39 +19,39 @@ public class ProduitRepository(DbProduitsContext context) : IProduitRepository
         return await context.Produits.ToListAsync();
     }
 
-    public Task<IEnumerable<Produit>> GetAllWithDetailsAsync()
+    public async Task<IEnumerable<Produit>> GetAllWithDetailsAsync()
     {
-        throw new NotImplementedException();
+        return await context.Produits.Include(p => p.MarqueNavigation).Include(p => p.TypeProduitNavigation).ToListAsync();
     }
 
-    public Task<Produit?> GetByIdAsync(int id)
+    public async Task<Produit?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        return await context.Produits.FirstOrDefaultAsync(p => p.IdProduit == id);
     }
 
-    public Task<Produit?> GetByIdWithDetailsAsync(int id)
+    public async Task<Produit?> GetByIdWithDetailsAsync(int id)
     {
-        throw new NotImplementedException();
+        return await context.Produits.Include(p => p.MarqueNavigation).Include(p => p.TypeProduitNavigation).FirstOrDefaultAsync(p => p.IdProduit == id);
     }
 
-    public Task<IEnumerable<Produit>> GetByMarqueAsync(int idMarque)
+    public async Task<IEnumerable<Produit>> GetByMarqueAsync(int idMarque)
     {
-        throw new NotImplementedException();
+        return await context.Produits.Where(p => p.IdMarque == idMarque).ToListAsync();
     }
 
-    public Task SaveAsync()
+    public async Task SaveAsync()
     {
-        throw new NotImplementedException();
+        await context.SaveChangesAsync();
     }
 
-    public Task<IEnumerable<Produit>> SearchByNameAsync(string term)
+    public async Task<IEnumerable<Produit>> SearchByNameAsync(string term)
     {
-        throw new NotImplementedException();
+        return await context.Produits.Where(p => p.nomProduit.Contains(term)).ToListAsync();
     }
 
-    public Task UpdateAsync(Produit entity)
+    public async Task UpdateAsync(Produit entity)
     {
-        throw new NotImplementedException();
+        await Task.Run(() => context.Produits.Update(entity));
     }
 }
 

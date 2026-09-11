@@ -1,7 +1,7 @@
 ﻿
 using TPRevision.Entities;
 
-public interface IRepository<T>(DbProduitsContext context) where T : class
+public interface IRepository<T> where T : class
 {
     Task<IEnumerable<T>> GetAllAsync();
     Task<T?> GetByIdAsync(int id);
