@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using TPRevision.Models;
+using TPRevision.Models.Model;
 
 namespace TPRevision.Controllers
 {

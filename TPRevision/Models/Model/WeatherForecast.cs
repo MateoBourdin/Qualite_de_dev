@@ -1,4 +1,4 @@
-namespace TPRevision.Models
+namespace TPRevision.Models.Model
 {
     public class WeatherForecast
     {
