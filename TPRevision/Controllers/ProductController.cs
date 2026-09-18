@@ -21,7 +21,7 @@ public class ProductController(IProduitRepository repo) : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<Produit>>> GetProduct()
+    public async Task<ActionResult<IEnumerable<Produit>>> GetAllProduct()
     {
         return  Ok(await repo.GetAllAsync());
     }
