@@ -39,7 +39,7 @@ public class ProductController(IProduitRepository repo) : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Produit>> GetProduct(int id)
+    public async Task<ActionResult<Produit>> GetProductById(int id)
     {
         var produit = await repo.GetByIdAsync(id);
 
@@ -63,12 +63,12 @@ public class ProductController(IProduitRepository repo) : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<Produit> CreateProduct([FromBody] Produit product)
+    public async Task<ActionResult<Produit>> PostProduct([FromBody] Produit product)
     {
-        repo.AddAsync(product);
-        repo.SaveAsync();
+        await repo.AddAsync(product);
+        await repo.SaveAsync();
 
-        return Ok(product);
+        return CreatedAtAction("GetById", new { id = product.IdProduit }, product);
     }
 
     // PATCH api/product
@@ -124,4 +124,6 @@ public class ProductController(IProduitRepository repo) : ControllerBase
         repo.DeleteAsync(id);
         return NoContent();
     }
+
+    
 }

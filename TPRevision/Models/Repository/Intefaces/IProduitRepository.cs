@@ -1,5 +1,5 @@
 ﻿
-public interface IProduitRepository : IRepository<Produit>
+public interface IProduitRepository : IDataRepository<Produit>
 {
     Task<IEnumerable<Produit>> GetAllWithDetailsAsync();
     Task<Produit?> GetByIdWithDetailsAsync(int id);

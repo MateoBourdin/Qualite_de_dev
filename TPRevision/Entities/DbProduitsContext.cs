@@ -22,9 +22,13 @@ public partial class DbProduitsContext : DbContext
     public virtual DbSet<TypeProduit> TypeProduits { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Produits;Username=postgres;Password=postgres");
-
+        }
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Marque>(entity =>
@@ -42,7 +46,7 @@ public partial class DbProduitsContext : DbContext
             entity.HasKey(e => e.IdProduit).HasName("t_e_produit_pro_pkey");
             entity.ToTable("t_e_produit_pro");
             entity.Property(e => e.IdProduit).HasColumnName("idProduit");
-            entity.Property(e => e.nomProduit)
+            entity.Property(e => e.NomProduit)
                 .HasMaxLength(50)
                 .HasColumnName("nomProduit");
             entity.Property(e => e.Description)

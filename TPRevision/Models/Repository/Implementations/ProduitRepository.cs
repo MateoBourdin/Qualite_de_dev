@@ -46,7 +46,7 @@ public class ProduitRepository(DbProduitsContext context) : IProduitRepository
 
     public async Task<IEnumerable<Produit>> SearchByNameAsync(string term)
     {
-        return await context.Produits.Where(p => p.nomProduit.Contains(term)).ToListAsync();
+        return await context.Produits.Where(p => p.NomProduit.Contains(term)).ToListAsync();
     }
 
     public async Task UpdateAsync(Produit entity)

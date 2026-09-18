@@ -16,7 +16,7 @@ public partial class Produit
 
     [Column("nomProduit")]
     [StringLength(50)]
-    public string nomProduit { get; set; } = null!;
+    public string NomProduit { get; set; } = null!;
 
 
     [Column("description")]
