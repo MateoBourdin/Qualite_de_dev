@@ -3,10 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using TPRevision.Entities;
 
-namespace API.Controller;
 
 [ApiController]
-[Route("api/product")]
+[Route("[controller]")]
 public class ProductController(IProduitRepository repo) : ControllerBase
 {
     // GET: api/product

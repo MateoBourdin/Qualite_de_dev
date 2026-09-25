@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using TPRevision.Entities;
+using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +15,11 @@ builder.Services.AddDbContext<DbProduitsContext>(options =>
 
 builder.Services.AddScoped<IProduitRepository, ProduitRepository>();
 builder.Services.AddScoped<IDataRepository<Marque>, MarqueRepository>();
+builder.Services.AddScoped<IDataRepository<TypeProduit>, TypeProduitRepository>();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
 
 builder.Services.AddControllers();
 
@@ -20,7 +28,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
 
 var app = builder.Build();
 

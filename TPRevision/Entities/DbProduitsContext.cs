@@ -26,9 +26,10 @@ public partial class DbProduitsContext : DbContext
         if (!optionsBuilder.IsConfigured)
         {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Produits;Username=postgres;Password=postgres");
+            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Produits;Username=postgres;Password=postgres");
         }
     }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Marque>(entity =>
@@ -61,11 +62,13 @@ public partial class DbProduitsContext : DbContext
             entity.Property(e => e.stockReel).HasColumnName("StockReel");
             entity.Property(e => e.stockMin).HasColumnName("StockMin");
             entity.Property(e => e.stockMax).HasColumnName("StockMax");
-            entity.HasOne(d => d.TypeProduitNavigation).WithMany()
+
+            entity.HasOne(d => d.TypeProduitNavigation).WithMany(p => p.produits)
                 .HasForeignKey(d => d.IdTypeProduit)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_typeproduit");
-            entity.HasOne(d => d.MarqueNavigation).WithMany()
+
+            entity.HasOne(d => d.MarqueNavigation).WithMany(p => p.produits)
                 .HasForeignKey(d => d.IdMarque)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_marque");
@@ -80,7 +83,6 @@ public partial class DbProduitsContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("nomTypeProduit");
         });
-
 
         OnModelCreatingPartial(modelBuilder);
     }
