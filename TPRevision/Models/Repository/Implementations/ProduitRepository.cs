@@ -1,8 +1,11 @@
-﻿
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using TPRevision.Entities;
+using TPRevision.Models.Model.Dtos;
 
-public class ProduitRepository(DbProduitsContext context) : IProduitRepository
+public class ProduitRepository(DbProduitsContext context, AutoMapper.IConfigurationProvider mapperConfig)
+    : IProduitRepository, IQueryService<ProduitDto, ProduitDetailDto>
 {
     public async Task AddAsync(Produit entity)
     {
@@ -21,7 +24,10 @@ public class ProduitRepository(DbProduitsContext context) : IProduitRepository
 
     public async Task<IEnumerable<Produit>> GetAllWithDetailsAsync()
     {
-        return await context.Produits.Include(p => p.MarqueNavigation).Include(p => p.TypeProduitNavigation).ToListAsync();
+        return await context.Produits
+            .Include(p => p.MarqueNavigation)
+            .Include(p => p.TypeProduitNavigation)
+            .ToListAsync();
     }
 
     public async Task<Produit?> GetByIdAsync(int id)
@@ -31,7 +37,10 @@ public class ProduitRepository(DbProduitsContext context) : IProduitRepository
 
     public async Task<Produit?> GetByIdWithDetailsAsync(int id)
     {
-        return await context.Produits.Include(p => p.MarqueNavigation).Include(p => p.TypeProduitNavigation).FirstOrDefaultAsync(p => p.IdProduit == id);
+        return await context.Produits
+            .Include(p => p.MarqueNavigation)
+            .Include(p => p.TypeProduitNavigation)
+            .FirstOrDefaultAsync(p => p.IdProduit == id);
     }
 
     public async Task<IEnumerable<Produit>> GetByMarqueAsync(int idMarque)
@@ -53,5 +62,19 @@ public class ProduitRepository(DbProduitsContext context) : IProduitRepository
     {
         await Task.Run(() => context.Produits.Update(entity));
     }
-}
 
+    public async Task<IEnumerable<ProduitDto>> GetAllDtoAsync()
+    {
+        return await context.Produits
+            .ProjectTo<ProduitDto>(mapperConfig)
+            .ToListAsync();
+    }
+
+    public async Task<ProduitDetailDto?> GetByIdDtoAsync(int id)
+    {
+        return await context.Produits
+            .Where(p => p.IdProduit == id)
+            .ProjectTo<ProduitDetailDto>(mapperConfig)
+            .FirstOrDefaultAsync();
+    }
+}

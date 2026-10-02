@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using TPRevision.Entities;
@@ -7,8 +6,8 @@ using TPRevision.Models.Model.Dtos;
 
 
 [ApiController]
-[Route("[controller]")]
-public class MarqueController(IDataRepository<Marque> repo, IMapper mapper) : ControllerBase
+[Route("api/marque")]
+public class MarqueController(IMarqueRepository repo, IQueryService<MarqueDto, MarqueDto> queryService) : Controller
 {
     // GET: api/marque
     [HttpGet]
@@ -24,8 +23,7 @@ public class MarqueController(IDataRepository<Marque> repo, IMapper mapper) : Co
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<MarqueDto>>> GetAllMarque()
     {
-        var marques = await repo.GetAllAsync();
-        return Ok(mapper.Map<IEnumerable<MarqueDto>>(marques));
+        return Ok(await queryService.GetAllDtoAsync());
     }
 
     // GET: api/marque
@@ -46,7 +44,6 @@ public class MarqueController(IDataRepository<Marque> repo, IMapper mapper) : Co
     }
 
 
-
     // GET api/marque/2
     [HttpGet]
     [Route("[action]/{id}")]
@@ -61,12 +58,12 @@ public class MarqueController(IDataRepository<Marque> repo, IMapper mapper) : Co
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MarqueDto>> GetMarqueById(int id)
     {
-        var tproduit = await repo.GetByIdAsync(id);
+        var marque = await queryService.GetByIdDtoAsync(id);
 
-        if (tproduit is null)
+        if (marque is null)
             return NotFound();
 
-        return Ok(mapper.Map<MarqueDto>(tproduit));
+        return Ok(marque);
     }
 
     // GET api/marque/2
@@ -83,15 +80,15 @@ public class MarqueController(IDataRepository<Marque> repo, IMapper mapper) : Co
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<Marque>> GetMarqueByIdWithDetails(int id)
     {
-        var tproduit = await repo.GetByIdWithDetailsAsync(id);
+        var marque = await repo.GetByIdWithDetailsAsync(id);
 
-        if (tproduit is null)
+        if (marque is null)
             return NotFound();
 
-        return Ok(tproduit);
+        return Ok(marque);
     }
 
-    // POST api/product
+    // POST api/marque
     [HttpPost]
     [Route("[action]")]
     [ActionName("AddProduct")]
@@ -103,7 +100,7 @@ public class MarqueController(IDataRepository<Marque> repo, IMapper mapper) : Co
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Produit>> PostMarque([FromBody] Marque marque)
+    public async Task<ActionResult<Marque>> PostMarque([FromBody] Marque marque)
     {
         await repo.AddAsync(marque);
         await repo.SaveAsync();
@@ -111,7 +108,7 @@ public class MarqueController(IDataRepository<Marque> repo, IMapper mapper) : Co
         return CreatedAtAction("GetById", new { id = marque.IdMarque }, marque);
     }
 
-    // PATCH api/product
+    // PATCH api/marque
     [HttpPatch]
     [Route("[action]")]
     [ActionName("ModifyProduct")]
@@ -129,7 +126,7 @@ public class MarqueController(IDataRepository<Marque> repo, IMapper mapper) : Co
         return Ok(marque);
     }
 
-    // PUT api/product
+    // PUT api/marque
     [HttpPut]
     [Route("[action]")]
     [ActionName("ModifyProductPartially")]
@@ -147,7 +144,7 @@ public class MarqueController(IDataRepository<Marque> repo, IMapper mapper) : Co
         return Ok(marque);
     }
 
-    // DELETE api/product
+    // DELETE api/marque
     [HttpDelete]
     [Route("[action]/{id}")]
     [ActionName("Delete")]
@@ -165,4 +162,3 @@ public class MarqueController(IDataRepository<Marque> repo, IMapper mapper) : Co
         return NoContent();
     }
 }
-

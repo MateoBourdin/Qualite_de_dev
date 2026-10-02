@@ -2,11 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using TPRevision.Entities;
+using TPRevision.Models.Model.Dtos;
 
 
 [ApiController]
 [Route("[controller]")]
-public class ProductController(IProduitRepository repo) : ControllerBase
+public class ProductController(IProduitRepository repo, IQueryService<ProduitDto, ProduitDetailDto> queryService) : ControllerBase
 {
     // GET: api/product
     [HttpGet]
@@ -20,9 +21,25 @@ public class ProductController(IProduitRepository repo) : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<Produit>>> GetAllProduct()
+    public async Task<ActionResult<IEnumerable<ProduitDto>>> GetAllProduct()
     {
-        return  Ok(await repo.GetAllAsync());
+        return Ok(await queryService.GetAllDtoAsync());
+    }
+
+    [HttpGet]
+    [Route("[action]")]
+    [ActionName("GetAllWithDetails")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IEnumerable<Produit>>> GetAllProductWithDetails()
+    {
+        return Ok(await repo.GetAllWithDetailsAsync());
     }
 
 
@@ -38,16 +55,15 @@ public class ProductController(IProduitRepository repo) : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Produit>> GetProductById(int id)
+    public async Task<ActionResult<ProduitDetailDto>> GetProductById(int id)
     {
-        var produit = await repo.GetByIdAsync(id);
+        var produit = await queryService.GetByIdDtoAsync(id);
 
         if (produit is null)
             return NotFound();
 
         return Ok(produit);
     }
-
 
 
     // POST api/product
@@ -123,6 +139,4 @@ public class ProductController(IProduitRepository repo) : ControllerBase
         repo.DeleteAsync(id);
         return NoContent();
     }
-
-    
 }

@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using TPRevision.Entities;
@@ -8,9 +7,9 @@ using TPRevision.Models.Model.Dtos;
 
 [ApiController]
 [Route("[controller]")]
-public class TypeProduitController(IDataRepository<TypeProduit> repo, IMapper mapper) : ControllerBase
+public class TypeProduitController(ITypeProduitRepository repo, IQueryService<TypeProduitDto, TypeProduitDto> queryService) : ControllerBase
 {
-    // GET: api/product
+    // GET: api/typeproduit
     [HttpGet]
     [Route("[action]")]
     [ActionName("GetAll")]
@@ -24,8 +23,7 @@ public class TypeProduitController(IDataRepository<TypeProduit> repo, IMapper ma
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<TypeProduitDto>>> GetAllProduct()
     {
-        var tproduits = await repo.GetAllAsync();
-        return Ok(mapper.Map<IEnumerable<TypeProduitDto>>(tproduits));
+        return Ok(await queryService.GetAllDtoAsync());
     }
 
     [HttpGet]
@@ -45,9 +43,7 @@ public class TypeProduitController(IDataRepository<TypeProduit> repo, IMapper ma
     }
 
 
-
-
-    // GET api/product/2
+    // GET api/typeproduit/2
     [HttpGet]
     [Route("[action]/{id}")]
     [ActionName("GetById")]
@@ -61,12 +57,12 @@ public class TypeProduitController(IDataRepository<TypeProduit> repo, IMapper ma
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TypeProduitDto>> GetProductById(int id)
     {
-        var tproduit = await repo.GetByIdAsync(id);
+        var tproduit = await queryService.GetByIdDtoAsync(id);
 
         if (tproduit is null)
             return NotFound();
 
-        return Ok(mapper.Map<TypeProduitDto>(tproduit));
+        return Ok(tproduit);
     }
 
     [HttpGet]
@@ -91,7 +87,7 @@ public class TypeProduitController(IDataRepository<TypeProduit> repo, IMapper ma
     }
 
 
-    // POST api/product
+    // POST api/typeproduit
     [HttpPost]
     [Route("[action]")]
     [ActionName("AddProduct")]
@@ -103,7 +99,7 @@ public class TypeProduitController(IDataRepository<TypeProduit> repo, IMapper ma
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Produit>> PostProduct([FromBody] TypeProduit tproduct)
+    public async Task<ActionResult<TypeProduit>> PostProduct([FromBody] TypeProduit tproduct)
     {
         await repo.AddAsync(tproduct);
         await repo.SaveAsync();
@@ -111,7 +107,7 @@ public class TypeProduitController(IDataRepository<TypeProduit> repo, IMapper ma
         return CreatedAtAction("GetById", new { id = tproduct.IdTypeProduit }, tproduct);
     }
 
-    // PATCH api/product
+    // PATCH api/typeproduit
     [HttpPatch]
     [Route("[action]")]
     [ActionName("ModifyProduct")]
@@ -129,7 +125,7 @@ public class TypeProduitController(IDataRepository<TypeProduit> repo, IMapper ma
         return Ok(tproduct);
     }
 
-    // PUT api/product
+    // PUT api/typeproduit
     [HttpPut]
     [Route("[action]")]
     [ActionName("ModifyProductPartially")]
@@ -147,7 +143,7 @@ public class TypeProduitController(IDataRepository<TypeProduit> repo, IMapper ma
         return Ok(tproduct);
     }
 
-    // DELETE api/product
+    // DELETE api/typeproduit
     [HttpDelete]
     [Route("[action]/{id}")]
     [ActionName("Delete")]
@@ -165,4 +161,3 @@ public class TypeProduitController(IDataRepository<TypeProduit> repo, IMapper ma
         return NoContent();
     }
 }
-

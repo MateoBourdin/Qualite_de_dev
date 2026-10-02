@@ -1,8 +1,11 @@
-﻿
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using TPRevision.Entities;
+using TPRevision.Models.Model.Dtos;
 
-public class TypeProduitRepository(DbProduitsContext context) : IDataRepository<TypeProduit>
+public class TypeProduitRepository(DbProduitsContext context, AutoMapper.IConfigurationProvider mapperConfig)
+    : ITypeProduitRepository, IQueryService<TypeProduitDto, TypeProduitDto>
 {
     public async Task AddAsync(TypeProduit entity)
     {
@@ -34,8 +37,6 @@ public class TypeProduitRepository(DbProduitsContext context) : IDataRepository<
         return await context.TypeProduits.Include(p => p.produits).FirstOrDefaultAsync(p => p.IdTypeProduit == id);
     }
 
-   
-
     public async Task SaveAsync()
     {
         await context.SaveChangesAsync();
@@ -50,5 +51,19 @@ public class TypeProduitRepository(DbProduitsContext context) : IDataRepository<
     {
         await Task.Run(() => context.TypeProduits.Update(entity));
     }
-}
 
+    public async Task<IEnumerable<TypeProduitDto>> GetAllDtoAsync()
+    {
+        return await context.TypeProduits
+            .ProjectTo<TypeProduitDto>(mapperConfig)
+            .ToListAsync();
+    }
+
+    public async Task<TypeProduitDto?> GetByIdDtoAsync(int id)
+    {
+        return await context.TypeProduits
+            .Where(p => p.IdTypeProduit == id)
+            .ProjectTo<TypeProduitDto>(mapperConfig)
+            .FirstOrDefaultAsync();
+    }
+}

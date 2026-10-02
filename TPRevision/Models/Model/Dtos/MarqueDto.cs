@@ -4,5 +4,6 @@
     {
         public int IdMarque { get; set; }
         public string NomMarque { get; set; } = null!;
+        public int NbProduits { get; set; }
     }
 }

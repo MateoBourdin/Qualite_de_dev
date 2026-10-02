@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TPRevision;
 using TPRevision.Entities;
+using TPRevision.Models.Model.Dtos;
 
 
 namespace API.Controller.Tests
@@ -18,12 +19,14 @@ namespace API.Controller.Tests
     {
         private ProductController _controller;
         private Mock<IProduitRepository> _repositoryMock;
+        private Mock<IQueryService<ProduitDto, ProduitDetailDto>> _queryServiceMock;
 
         [TestInitialize]
         public void Setup()
         {
             _repositoryMock = new Mock<IProduitRepository>();
-            _controller = new ProductController(_repositoryMock.Object);
+            _queryServiceMock = new Mock<IQueryService<ProduitDto, ProduitDetailDto>>();
+            _controller = new ProductController(_repositoryMock.Object, _queryServiceMock.Object);
         }
 
 
@@ -31,15 +34,15 @@ namespace API.Controller.Tests
         public async Task ShowIdGetAllProducts()
         {
             // Given
-            var produits = new List<Produit>
+            var produits = new List<ProduitDto>
             {
-                new Produit { IdProduit = 1, NomProduit = "Produit 1", stockMin = 5, stockMax = 50 },
-                new Produit { IdProduit = 2, NomProduit = "Produit 2", stockMin = 10, stockMax = 30 },
-                new Produit { IdProduit = 3, NomProduit = "Produit 3", stockMin = 2, stockMax = 20 }
+                new ProduitDto { Id = 1, Nom = "Produit 1", Type = "Smartphone", Marque = "Apple" },
+                new ProduitDto { Id = 2, Nom = "Produit 2", Type = "Ordinateur portable", Marque = "Dell" },
+                new ProduitDto { Id = 3, Nom = "Produit 3", Type = "Casque audio", Marque = "Sony" }
             };
 
-            _repositoryMock.Setup(repo => repo.GetAllAsync())
-                            .ReturnsAsync(produits);
+            _queryServiceMock.Setup(qs => qs.GetAllDtoAsync())
+                              .ReturnsAsync(produits);
 
             // When
             var actionResult = await _controller.GetAllProduct();
@@ -49,7 +52,7 @@ namespace API.Controller.Tests
             Assert.IsNotNull(okResult);
             Assert.AreEqual(200, okResult.StatusCode);
 
-            var returnedProducts = okResult.Value as IEnumerable<Produit>;
+            var returnedProducts = okResult.Value as IEnumerable<ProduitDto>;
             Assert.IsNotNull(returnedProducts);
             Assert.AreEqual(3, returnedProducts.Count());
         }
@@ -58,10 +61,10 @@ namespace API.Controller.Tests
         public async Task GetAllProducts_ReturnsEmptyList_WhenNoProductsExist()
         {
             // Given
-            var produits = new List<Produit>();
+            var produits = new List<ProduitDto>();
 
-            _repositoryMock.Setup(repo => repo.GetAllAsync())
-                            .ReturnsAsync(produits);
+            _queryServiceMock.Setup(qs => qs.GetAllDtoAsync())
+                              .ReturnsAsync(produits);
 
             // When
             var actionResult = await _controller.GetAllProduct();
@@ -71,7 +74,7 @@ namespace API.Controller.Tests
             Assert.IsNotNull(okResult);
             Assert.AreEqual(200, okResult.StatusCode);
 
-            var returnedProducts = okResult.Value as IEnumerable<Produit>;
+            var returnedProducts = okResult.Value as IEnumerable<ProduitDto>;
             Assert.IsNotNull(returnedProducts);
             Assert.AreEqual(0, returnedProducts.Count());
         }
@@ -80,10 +83,21 @@ namespace API.Controller.Tests
         public async Task GetProductById_ReturnsProduct_WhenIdExists()
         {
             // Given
-            var produit = new Produit { IdProduit = 1, NomProduit = "Produit 1", stockMin = 5, stockMax = 50 };
+            var produit = new ProduitDetailDto
+            {
+                Id = 1,
+                Nom = "Produit 1",
+                Type = "Smartphone",
+                Marque = "Apple",
+                Description = "Un smartphone",
+                Nomphoto = "produit1.jpg",
+                Uriphoto = "/images/produit1.jpg",
+                Stock = 10,
+                EnReappro = false
+            };
 
-            _repositoryMock.Setup(repo => repo.GetByIdAsync(1))
-                            .ReturnsAsync(produit);
+            _queryServiceMock.Setup(qs => qs.GetByIdDtoAsync(1))
+                              .ReturnsAsync(produit);
 
             // When
             var actionResult = await _controller.GetProductById(1);
@@ -93,18 +107,18 @@ namespace API.Controller.Tests
             Assert.IsNotNull(okResult);
             Assert.AreEqual(200, okResult.StatusCode);
 
-            var returnedProduct = okResult.Value as Produit;
+            var returnedProduct = okResult.Value as ProduitDetailDto;
             Assert.IsNotNull(returnedProduct);
-            Assert.AreEqual(1, returnedProduct.IdProduit);
-            Assert.AreEqual("Produit 1", returnedProduct.NomProduit);
+            Assert.AreEqual(1, returnedProduct.Id);
+            Assert.AreEqual("Produit 1", returnedProduct.Nom);
         }
 
         [TestMethod()]
         public async Task GetProductById_ReturnsNotFound_WhenIdDoesNotExist()
         {
             // Given
-            _repositoryMock.Setup(repo => repo.GetByIdAsync(999))
-                            .ReturnsAsync((Produit)null);
+            _queryServiceMock.Setup(qs => qs.GetByIdDtoAsync(999))
+                              .ReturnsAsync((ProduitDetailDto)null);
 
             // When
             var actionResult = await _controller.GetProductById(999);
@@ -113,6 +127,33 @@ namespace API.Controller.Tests
             var notFoundResult = actionResult.Result as NotFoundResult;
             Assert.IsNotNull(notFoundResult);
             Assert.AreEqual(404, notFoundResult.StatusCode);
+        }
+
+        [TestMethod()]
+        public async Task GetProductById_ReturnsEnReappro_WhenStockBelowMin()
+        {
+            // Given
+            var produit = new ProduitDetailDto
+            {
+                Id = 4,
+                Nom = "Produit en rupture",
+                Type = "Smartphone",
+                Marque = "Sony",
+                Stock = 2,
+                EnReappro = true
+            };
+
+            _queryServiceMock.Setup(qs => qs.GetByIdDtoAsync(4))
+                              .ReturnsAsync(produit);
+
+            // When
+            var actionResult = await _controller.GetProductById(4);
+
+            // Then
+            var okResult = actionResult.Result as OkObjectResult;
+            var returnedProduct = okResult.Value as ProduitDetailDto;
+            Assert.IsNotNull(returnedProduct);
+            Assert.IsTrue(returnedProduct.EnReappro);
         }
 
     }

@@ -1,8 +1,9 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using TPRevision.Entities;
-using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
+using TPRevision.Models.Model.Dtos;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,8 +15,13 @@ builder.Services.AddDbContext<DbProduitsContext>(options =>
 );
 
 builder.Services.AddScoped<IProduitRepository, ProduitRepository>();
-builder.Services.AddScoped<IDataRepository<Marque>, MarqueRepository>();
-builder.Services.AddScoped<IDataRepository<TypeProduit>, TypeProduitRepository>();
+builder.Services.AddScoped<IQueryService<ProduitDto, ProduitDetailDto>, ProduitRepository>();
+
+builder.Services.AddScoped<IMarqueRepository, MarqueRepository>();
+builder.Services.AddScoped<IQueryService<MarqueDto, MarqueDto>, MarqueRepository>();
+
+builder.Services.AddScoped<ITypeProduitRepository, TypeProduitRepository>();
+builder.Services.AddScoped<IQueryService<TypeProduitDto, TypeProduitDto>, TypeProduitRepository>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

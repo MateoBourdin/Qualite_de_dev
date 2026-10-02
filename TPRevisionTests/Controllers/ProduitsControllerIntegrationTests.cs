@@ -1,4 +1,5 @@
 ﻿using API.Controller;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -6,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using TPRevision;
 using TPRevision.Entities;
+using TPRevision.Models.Model.Dtos;
 
 namespace API.Controller.Tests
 {
@@ -30,8 +32,12 @@ namespace API.Controller.Tests
             await _context.Database.EnsureDeletedAsync();
             await _context.Database.EnsureCreatedAsync();
 
-            _repository = new ProduitRepository(_context);
-            _controller = new ProductController(_repository);
+            var mapperConfig = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
+
+            // ProduitRepository implémente à la fois IProduitRepository et IQueryService<ProduitDto, ProduitDetailDto>,
+            // la même instance sert donc aux deux rôles ici.
+            _repository = new ProduitRepository(_context, mapperConfig);
+            _controller = new ProductController(_repository, _repository);
         }
 
         [TestCleanup]
@@ -77,7 +83,7 @@ namespace API.Controller.Tests
             Assert.IsNotNull(produitCree);
             Assert.IsTrue(produitCree.IdProduit > 0);
 
-            // When : relecture via le contrôleur
+            // When : relecture via le contrôleur (renvoie un ProduitDetailDto)
             var getResult = await _controller.GetProductById(produitCree.IdProduit);
 
             // Then : le produit persisté est bien retourné avec 200 OK
@@ -85,12 +91,14 @@ namespace API.Controller.Tests
             Assert.IsNotNull(okResult);
             Assert.AreEqual(200, okResult.StatusCode);
 
-            var produitRelu = okResult.Value as Produit;
+            var produitRelu = okResult.Value as ProduitDetailDto;
             Assert.IsNotNull(produitRelu);
-            Assert.AreEqual(produitCree.IdProduit, produitRelu.IdProduit);
-            Assert.AreEqual("iPhone 17", produitRelu.NomProduit);
-            Assert.AreEqual(marque.IdMarque, produitRelu.IdMarque);
-            Assert.AreEqual(typeProduit.IdTypeProduit, produitRelu.IdTypeProduit);
+            Assert.AreEqual(produitCree.IdProduit, produitRelu.Id);
+            Assert.AreEqual("iPhone 17", produitRelu.Nom);
+            Assert.AreEqual("Apple", produitRelu.Marque);
+            Assert.AreEqual("Smartphone", produitRelu.Type);
+            Assert.AreEqual(10, produitRelu.Stock);
+            Assert.IsFalse(produitRelu.EnReappro);
         }
     }
 }

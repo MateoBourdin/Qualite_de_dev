@@ -14,5 +14,7 @@ namespace TPRevision.Models.Model.Dtos
 
         public string NomTypeProduit { get; set; } = null!;
 
+        public int NbProduits { get; set; }
+
     }
 }
