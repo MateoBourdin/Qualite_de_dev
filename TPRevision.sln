@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TPRevision", "TPRevision\TP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TPRevisionTests", "TPRevisionTests\TPRevisionTests.csproj", "{C84CC627-48F4-46A9-92F4-D5C2A34CE2B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientBlazor", "ClientBlazor\ClientBlazor.csproj", "{6CF3BA56-4835-4436-A9B5-46AAB785E3DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C84CC627-48F4-46A9-92F4-D5C2A34CE2B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C84CC627-48F4-46A9-92F4-D5C2A34CE2B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C84CC627-48F4-46A9-92F4-D5C2A34CE2B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CF3BA56-4835-4436-A9B5-46AAB785E3DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CF3BA56-4835-4436-A9B5-46AAB785E3DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CF3BA56-4835-4436-A9B5-46AAB785E3DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CF3BA56-4835-4436-A9B5-46AAB785E3DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
