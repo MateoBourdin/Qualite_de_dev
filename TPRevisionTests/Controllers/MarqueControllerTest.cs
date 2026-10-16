@@ -1,4 +1,4 @@
-﻿using API.Controller;
+using API.Controller;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -39,7 +39,7 @@ namespace API.Controller.Tests
                               .ReturnsAsync(marques);
 
             // When
-            var actionResult = await _controller.GetAllMarque();
+            var actionResult = await _controller.GetAll();
 
             // Then
             var okResult = actionResult.Result as OkObjectResult;
@@ -62,7 +62,7 @@ namespace API.Controller.Tests
                               .ReturnsAsync(marque);
 
             // When
-            var actionResult = await _controller.GetMarqueById(1);
+            var actionResult = await _controller.GetById(1);
 
             // Then
             var okResult = actionResult.Result as OkObjectResult;
@@ -81,7 +81,7 @@ namespace API.Controller.Tests
                               .ReturnsAsync((MarqueDto)null);
 
             // When
-            var actionResult = await _controller.GetMarqueById(999);
+            var actionResult = await _controller.GetById(999);
 
             // Then
             var notFoundResult = actionResult.Result as NotFoundResult;

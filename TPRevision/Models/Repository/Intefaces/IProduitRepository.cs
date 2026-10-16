@@ -1,4 +1,4 @@
-﻿using TPRevision.Entities;
+using TPRevision.Entities;
 
 public interface IProduitRepository : IDataRepository<Produit>, IDetailReadable<Produit>, ISearchable<Produit>
 {

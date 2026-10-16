@@ -1,0 +1,42 @@
+@page "/typeproduits"
+@inject ListViewModel<TypeProduitDto, TypeProduitDto> ViewModel
+
+<PageTitle>Types de produit</PageTitle>
+
+<h1>Types de produit</h1>
+
+@if (ViewModel.IsLoading)
+{
+    <p><em>Chargement...</em></p>
+}
+else if (ViewModel.ErrorMessage is not null)
+{
+    <div class="alert alert-danger">@ViewModel.ErrorMessage</div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Nombre de produits</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewModel.Items)
+            {
+                <tr>
+                    <td>@item.NomTypeProduit</td>
+                    <td>@item.NbProduits</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.LoadDataAsync();
+    }
+}

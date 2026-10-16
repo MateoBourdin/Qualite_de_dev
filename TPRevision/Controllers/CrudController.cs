@@ -1,56 +1,120 @@
-﻿
-
-
+using System.Data.Common;
 using Microsoft.AspNetCore.Mvc;
-using TPRevision.Models.Model.Dtos;
+using Microsoft.EntityFrameworkCore;
 
-public class CrudController<T>: ControllerBase where T : class 
+[ApiController]
+[ProducesResponseType(StatusCodes.Status200OK)]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status403Forbidden)]
+[ProducesResponseType(StatusCodes.Status404NotFound)]
+[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+public abstract class CrudController<TEntity, TListDto, TDetailDto>(
+    IDataRepository<TEntity> repo,
+    IDetailReadable<TEntity> detailReader,
+    IQueryService<TListDto, TDetailDto> queryService) : ControllerBase
+    where TEntity : class
+    where TListDto : class
+    where TDetailDto : class
 {
+    // Chaque contrôleur donne l'id de son entité (utilisé pour le CreatedAtAction du POST)
+    protected abstract int GetId(TEntity entity);
 
-    public async Task<ActionResult<IEnumerable<MarqueDto>>> GetAll()
+    [HttpGet("[action]")]
+    [ActionName("GetAll")]
+    public async Task<ActionResult<IEnumerable<TListDto>>> GetAll()
     {
         return Ok(await queryService.GetAllDtoAsync());
     }
 
-    public async Task<ActionResult<IEnumerable<Marque>>> GetAllWithDetails()
+    [HttpGet("[action]/{id}")]
+    [ActionName("GetById")]
+    public async Task<ActionResult<TDetailDto>> GetById(int id)
     {
-        return Ok(await repo.GetAllWithDetailsAsync());
-    }
-    public async Task<ActionResult<MarqueDto>> GetById(int id)
-    {
-        var elt = await queryService.GetByIdDtoAsync(id);
+        var dto = await queryService.GetByIdDtoAsync(id);
 
-        if (elt is null)
+        if (dto is null)
             return NotFound();
 
-        return Ok(elt);
+        return Ok(dto);
     }
 
-
-    public async Task<ActionResult<Marque>> GetByIdWithDetails(int id)
+    [HttpGet("[action]")]
+    [ActionName("GetAllWithDetails")]
+    public async Task<ActionResult<IEnumerable<TEntity>>> GetAllWithDetails()
     {
-        var elt = await repo.GetByIdWithDetailsAsync(id);
+        return Ok(await detailReader.GetAllWithDetailsAsync());
+    }
 
-        if (elt is null)
+    [HttpGet("[action]/{id}")]
+    [ActionName("GetByIdWithDetails")]
+    public async Task<ActionResult<TEntity>> GetByIdWithDetails(int id)
+    {
+        var entity = await detailReader.GetByIdWithDetailsAsync(id);
+
+        if (entity is null)
             return NotFound();
 
-        return Ok(elt);
+        return Ok(entity);
     }
 
-
-    public async Task<ActionResult<Marque>> Post([FromBody] Marque marque)
+    // Les écritures se font avec l'entité complète, les DTOs servent uniquement à l'affichage
+    [HttpPost("[action]")]
+    [ActionName("AddProduct")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<ActionResult<TEntity>> Post([FromBody] TEntity entity)
     {
-        await repo.AddAsync(marque);
+        await repo.AddAsync(entity);
         await repo.SaveAsync();
 
-        return CreatedAtAction("GetById", new { id = marque.IdMarque }, marque);
+        return CreatedAtAction("GetById", new { id = GetId(entity) }, entity);
     }
 
-
-    public IActionResult Modify([FromBody] Marque marque)
+    [HttpPatch("[action]")]
+    [ActionName("ModifyProduct")]
+    public async Task<IActionResult> Patch([FromBody] TEntity entity)
     {
-        repo.UpdateAsync(marque);
-        return Ok(marque);
+        return await Update(entity);
     }
 
+    [HttpPut("[action]")]
+    [ActionName("ModifyProductPartially")]
+    public async Task<IActionResult> Put([FromBody] TEntity entity)
+    {
+        return await Update(entity);
+    }
+
+    [HttpDelete("[action]/{id}")]
+    [ActionName("Delete")]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            await repo.DeleteAsync(id);
+        }
+        catch (DbException)
+        {
+            // La base refuse la suppression (ex : une marque encore utilisée par des produits)
+            return Conflict("Impossible de supprimer : l'élément est encore référencé.");
+        }
+
+        return NoContent();
+    }
+
+    private async Task<IActionResult> Update(TEntity entity)
+    {
+        try
+        {
+            await repo.UpdateAsync(entity);
+            await repo.SaveAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            // Aucune ligne modifiée : l'id envoyé n'existe pas
+            return NotFound();
+        }
+
+        return Ok(entity);
+    }
 }

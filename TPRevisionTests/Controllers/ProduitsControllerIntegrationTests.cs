@@ -1,4 +1,4 @@
-﻿using API.Controller;
+using API.Controller;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -72,7 +72,7 @@ namespace API.Controller.Tests
             };
 
             // When : création via le contrôleur
-            var postResult = await _controller.PostProduct(nouveauProduit);
+            var postResult = await _controller.Post(nouveauProduit);
 
             // Then : la création renvoie 201 CreatedAtAction
             var createdResult = postResult.Result as CreatedAtActionResult;
@@ -84,7 +84,7 @@ namespace API.Controller.Tests
             Assert.IsTrue(produitCree.IdProduit > 0);
 
             // When : relecture via le contrôleur (renvoie un ProduitDetailDto)
-            var getResult = await _controller.GetProductById(produitCree.IdProduit);
+            var getResult = await _controller.GetById(produitCree.IdProduit);
 
             // Then : le produit persisté est bien retourné avec 200 OK
             var okResult = getResult.Result as OkObjectResult;
@@ -99,6 +99,41 @@ namespace API.Controller.Tests
             Assert.AreEqual("Smartphone", produitRelu.Type);
             Assert.AreEqual(10, produitRelu.Stock);
             Assert.IsFalse(produitRelu.EnReappro);
+        }
+    
+
+        [TestMethod()]
+        public async Task GetById_ProduitSansStock_RenvoieEnReapproFalse()
+        {
+            // Given : un produit sans stock renseigné (StockReel et StockMin à NULL en base)
+            var marque = new Marque { NomMarque = "Asus" };
+            var typeProduit = new TypeProduit { NomTypeProduit = "Écran" };
+            _context.Marques.Add(marque);
+            _context.TypeProduits.Add(typeProduit);
+            await _context.SaveChangesAsync();
+
+            var produit = new Produit
+            {
+                NomProduit = "ProArt PA278QV",
+                Description = "Ecran 27 pouces",
+                NomPhoto = "pa278qv.jpg",
+                UriPhoto = "/images/pa278qv.jpg",
+                IdMarque = marque.IdMarque,
+                IdTypeProduit = typeProduit.IdTypeProduit
+            };
+            _context.Produits.Add(produit);
+            await _context.SaveChangesAsync();
+
+            // When : la projection ProjectTo est exécutée en SQL
+            var result = await _controller.GetById(produit.IdProduit);
+
+            // Then : pas d'exception, EnReappro vaut false et Stock reste null
+            var okResult = result.Result as OkObjectResult;
+            Assert.IsNotNull(okResult);
+            var dto = okResult.Value as ProduitDetailDto;
+            Assert.IsNotNull(dto);
+            Assert.IsFalse(dto.EnReappro);
+            Assert.IsNull(dto.Stock);
         }
     }
 }

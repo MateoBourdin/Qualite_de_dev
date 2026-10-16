@@ -1,4 +1,4 @@
-﻿public interface IQueryService<TListDto, TDetailDto>
+public interface IQueryService<TListDto, TDetailDto>
     where TListDto : class
     where TDetailDto : class
 {

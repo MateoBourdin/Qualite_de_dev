@@ -66,35 +66,23 @@ namespace TPRevision.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("idTypeProduit");
 
-                    b.Property<int?>("MarqueIdMarque")
-                        .HasColumnType("integer");
-
                     b.Property<string>("NomPhoto")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("nomPhoto");
 
-                    b.Property<int?>("TypeProduitIdTypeProduit")
-                        .HasColumnType("integer");
+                    b.Property<string>("NomProduit")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("nomProduit");
 
                     b.Property<string>("UriPhoto")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("uriPhoto");
-
-                    b.Property<int>("idMarque")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("idTypeProduit")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("nomProduit")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("nomProduit");
 
                     b.Property<int?>("stockMax")
                         .HasColumnType("integer")
@@ -115,18 +103,7 @@ namespace TPRevision.Migrations
 
                     b.HasIndex("IdTypeProduit");
 
-                    b.HasIndex("MarqueIdMarque");
-
-                    b.HasIndex("TypeProduitIdTypeProduit");
-
-                    b.ToTable("t_e_produit_pro", null, t =>
-                        {
-                            t.Property("idMarque")
-                                .HasColumnName("idMarque1");
-
-                            t.Property("idTypeProduit")
-                                .HasColumnName("idTypeProduit1");
-                        });
+                    b.ToTable("t_e_produit_pro", (string)null);
                 });
 
             modelBuilder.Entity("TypeProduit", b =>
@@ -153,24 +130,16 @@ namespace TPRevision.Migrations
             modelBuilder.Entity("Produit", b =>
                 {
                     b.HasOne("Marque", "MarqueNavigation")
-                        .WithMany()
+                        .WithMany("produits")
                         .HasForeignKey("IdMarque")
                         .IsRequired()
                         .HasConstraintName("fk_marque");
 
                     b.HasOne("TypeProduit", "TypeProduitNavigation")
-                        .WithMany()
+                        .WithMany("produits")
                         .HasForeignKey("IdTypeProduit")
                         .IsRequired()
                         .HasConstraintName("fk_typeproduit");
-
-                    b.HasOne("Marque", null)
-                        .WithMany("produits")
-                        .HasForeignKey("MarqueIdMarque");
-
-                    b.HasOne("TypeProduit", null)
-                        .WithMany("produits")
-                        .HasForeignKey("TypeProduitIdTypeProduit");
 
                     b.Navigation("MarqueNavigation");
 

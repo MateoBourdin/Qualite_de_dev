@@ -1,4 +1,4 @@
-﻿using API.Controller;
+using API.Controller;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -39,7 +39,7 @@ namespace API.Controller.Tests
                               .ReturnsAsync(types);
 
             // When
-            var actionResult = await _controller.GetAllProduct();
+            var actionResult = await _controller.GetAll();
 
             // Then
             var okResult = actionResult.Result as OkObjectResult;
@@ -62,7 +62,7 @@ namespace API.Controller.Tests
                               .ReturnsAsync(type);
 
             // When
-            var actionResult = await _controller.GetProductById(1);
+            var actionResult = await _controller.GetById(1);
 
             // Then
             var okResult = actionResult.Result as OkObjectResult;
@@ -81,7 +81,7 @@ namespace API.Controller.Tests
                               .ReturnsAsync((TypeProduitDto)null);
 
             // When
-            var actionResult = await _controller.GetProductById(999);
+            var actionResult = await _controller.GetById(999);
 
             // Then
             var notFoundResult = actionResult.Result as NotFoundResult;

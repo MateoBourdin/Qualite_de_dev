@@ -1,4 +1,4 @@
-﻿using API.Controller;
+using API.Controller;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -45,7 +45,7 @@ namespace API.Controller.Tests
                               .ReturnsAsync(produits);
 
             // When
-            var actionResult = await _controller.GetAllProduct();
+            var actionResult = await _controller.GetAll();
 
             // Then
             var okResult = actionResult.Result as OkObjectResult;
@@ -67,7 +67,7 @@ namespace API.Controller.Tests
                               .ReturnsAsync(produits);
 
             // When
-            var actionResult = await _controller.GetAllProduct();
+            var actionResult = await _controller.GetAll();
 
             // Then
             var okResult = actionResult.Result as OkObjectResult;
@@ -100,7 +100,7 @@ namespace API.Controller.Tests
                               .ReturnsAsync(produit);
 
             // When
-            var actionResult = await _controller.GetProductById(1);
+            var actionResult = await _controller.GetById(1);
 
             // Then
             var okResult = actionResult.Result as OkObjectResult;
@@ -121,7 +121,7 @@ namespace API.Controller.Tests
                               .ReturnsAsync((ProduitDetailDto)null);
 
             // When
-            var actionResult = await _controller.GetProductById(999);
+            var actionResult = await _controller.GetById(999);
 
             // Then
             var notFoundResult = actionResult.Result as NotFoundResult;
@@ -147,7 +147,7 @@ namespace API.Controller.Tests
                               .ReturnsAsync(produit);
 
             // When
-            var actionResult = await _controller.GetProductById(4);
+            var actionResult = await _controller.GetById(4);
 
             // Then
             var okResult = actionResult.Result as OkObjectResult;

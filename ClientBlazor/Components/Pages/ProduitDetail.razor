@@ -1,0 +1,56 @@
+@page "/produits/{Id:int}"
+@inject DetailViewModel<ProduitDto, ProduitDetailDto> ViewModel
+
+<PageTitle>Détail produit</PageTitle>
+
+@if (ViewModel.IsLoading)
+{
+    <p><em>Chargement...</em></p>
+}
+else if (ViewModel.ErrorMessage is not null)
+{
+    <div class="alert alert-danger">@ViewModel.ErrorMessage</div>
+}
+else if (ViewModel.Item is null)
+{
+    <p>Produit introuvable.</p>
+}
+else
+{
+    <h1>@ViewModel.Item.Nom</h1>
+
+    @if (!string.IsNullOrWhiteSpace(ViewModel.Item.Description))
+    {
+        <p>@ViewModel.Item.Description</p>
+    }
+
+    <ul>
+        <li>Type : @ViewModel.Item.Type</li>
+        <li>Marque : @ViewModel.Item.Marque</li>
+        <li>Stock : @(ViewModel.Item.Stock?.ToString() ?? "non renseigné")</li>
+        <li>
+            Réapprovisionnement :
+            @if (ViewModel.Item.EnReappro)
+            {
+                <span class="badge bg-warning text-dark">À commander</span>
+            }
+            else
+            {
+                <span class="badge bg-success">Stock suffisant</span>
+            }
+        </li>
+    </ul>
+}
+
+<a href="produits">&larr; Retour à la liste</a>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    // OnParametersSet plutôt qu'OnInitialized : la page se recharge si l'id change
+    protected override async Task OnParametersSetAsync()
+    {
+        await ViewModel.LoadDataAsync(Id);
+    }
+}

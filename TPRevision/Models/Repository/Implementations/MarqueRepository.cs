@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using TPRevision.Entities;
@@ -47,9 +47,11 @@ public class MarqueRepository(DbProduitsContext context, AutoMapper.IConfigurati
         return await context.Marques.Where(p => p.NomMarque.Contains(term)).ToListAsync();
     }
 
-    public async Task UpdateAsync(Marque entity)
+    public Task UpdateAsync(Marque entity)
     {
-        await Task.Run(() => context.Marques.Update(entity));
+        // Update ne fait que marquer l'entité comme modifiée : l'écriture se fait au SaveAsync
+        context.Marques.Update(entity);
+        return Task.CompletedTask;
     }
 
     public async Task<IEnumerable<MarqueDto>> GetAllDtoAsync()

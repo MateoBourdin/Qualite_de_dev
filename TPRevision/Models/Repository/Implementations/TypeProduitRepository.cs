@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using TPRevision.Entities;
@@ -47,9 +47,11 @@ public class TypeProduitRepository(DbProduitsContext context, AutoMapper.IConfig
         return await context.TypeProduits.Where(p => p.NomTypeProduit.Contains(term)).ToListAsync();
     }
 
-    public async Task UpdateAsync(TypeProduit entity)
+    public Task UpdateAsync(TypeProduit entity)
     {
-        await Task.Run(() => context.TypeProduits.Update(entity));
+        // Update ne fait que marquer l'entité comme modifiée : l'écriture se fait au SaveAsync
+        context.TypeProduits.Update(entity);
+        return Task.CompletedTask;
     }
 
     public async Task<IEnumerable<TypeProduitDto>> GetAllDtoAsync()

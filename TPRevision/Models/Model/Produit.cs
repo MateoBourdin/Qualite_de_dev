@@ -43,15 +43,15 @@ public partial class Produit
         get; set;
     }
 
-    [ForeignKey("idTypeProduit")]
+    [ForeignKey(nameof(IdTypeProduit))]
     [InverseProperty(nameof(TypeProduit.produits))]
     //[NavigationProperty]
-    public virtual TypeProduit TypeProduitNavigation { get; set; } = null!;
+    public virtual TypeProduit? TypeProduitNavigation { get; set; }
 
-    [ForeignKey("idMarque")]
+    [ForeignKey(nameof(IdMarque))]
     [InverseProperty(nameof(Marque.produits))]
     //[NavigationProperty]
-    public virtual Marque MarqueNavigation { get; set; } = null!;
+    public virtual Marque? MarqueNavigation { get; set; }
 
     [Column("StockReel")]
     public int? stockReel { get; set; } = null!;
